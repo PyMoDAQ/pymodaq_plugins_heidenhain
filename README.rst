@@ -9,8 +9,8 @@ pymodaq_plugins_heidenhain
    :target: https://pymodaq.readthedocs.io/en/stable/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://github.com/jerlfan/pymodaq_plugins_heidenhain/actions/workflows/Test.yml/badge.svg
-    :target: https://github.com/jerlfan/pymodaq_plugins_heidenhain/actions/workflows/Test.yml
+.. image:: https://github.com/jerlfan/pymodaq_plugins_heidenhain/actions/workflows/tests.yml/badge.svg
+    :target: https://github.com/jerlfan/pymodaq_plugins_heidenhain/actions/workflows/tests.yml
 
 PyMoDAQ plugins for HEIDENHAIN encoders read through the IK 220 PC counter card, such as the LC 483 absolute linear
 encoder (EnDat interface). This branch targets **PyMoDAQ 5.3.x** (Python 3.10 to 3.13).
@@ -45,4 +45,3 @@ Development
 * Check it, without any hardware: ``check_plugin`` (and ``pytest tests``)
 * If you use an AI coding assistant, point it to ``AGENTS.md``: it describes the patterns to follow for instrument
   plugins, Dashboard extensions and standalone apps.
-  
