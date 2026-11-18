@@ -1,2 +1,6 @@
-title = 'this is the configuration file of the plugin XXX'
+title = 'Configuration file of the plugin pymodaq_plugins_heidenhain'
 
+[ik220]
+mode = 'MOCK'  # 'MOCK': simulated card, 'IK220': real IK 220 card
+axis = 1  # IK 220 axis of the encoder, from 0 to 15 (1: the ruler of the Dilor Z40)
+dll_path = 'C:\Program Files (x86)\HEIDENHAIN\DLL64'  # folder of IK220Dll64.dll
