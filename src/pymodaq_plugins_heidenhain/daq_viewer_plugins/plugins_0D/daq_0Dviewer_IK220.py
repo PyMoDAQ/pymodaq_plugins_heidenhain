@@ -12,26 +12,25 @@ from pymodaq_plugins_heidenhain.hardware.ik220_mock import IK220Mock
 
 
 class DAQ_0DViewer_IK220(DAQ_Viewer_base):
-    """ Instrument plugin class for a OD viewer.
-    
-    This object inherits all functionalities to communicate with PyMoDAQ’s DAQ_Viewer module through inheritance via
-    DAQ_Viewer_base. It makes a bridge between the DAQ_Viewer module and the Python wrapper of a particular instrument.
+    """PyMoDAQ 0D viewer giving the absolute position, in mm, of a HEIDENHAIN EnDat encoder read by an IK 220 card.
 
-    TODO Complete the docstring of your plugin with:
-        * The set of instruments that should be compatible with this instrument plugin.
-        * With which instrument it has actually been tested.
-        * The version of PyMoDAQ during the test.
-        * The version of the operating system.
-        * Installation instructions: what manufacturer’s drivers should be installed to make it run?
+    Compatible devices: HEIDENHAIN IK 220 PC counter card (PCI) with an absolute encoder with EnDat interface, such as
+    the LC 483 linear encoder.
+
+    Tested: the hardware class (hardware/ik220.py) was tested with an IK 220 card and an LC 483 encoder on axis 1
+    (ruler of the Dilor Z40 spectrometer), Windows 10 64 bits, PyMoDAQ 5.3.11, including after a cold start of the PC.
+    The plugin itself has only been tested in MOCK mode so far (simulated card, hardware/ik220_mock.py).
+
+    Installation: HEIDENHAIN IK 220 driver and DLL (IK220Dll64.dll, package 739275-05 for Windows 10 64 bits), and a
+    64-bit Python. Set the mode to IK220 and the axis in the local configuration file config_heidenhain.toml.
+
+    Only one program may use the card at a time: the HEIDENHAIN test application calls IK220Init when it starts,
+    which erases the configuration made by this plugin. Close it before initializing the plugin.
 
     Attributes:
     -----------
-    controller: object
-        The particular object that allow the communication with the hardware, in general a python wrapper around the
-         hardware library.
-         
-    # TODO add your particular attributes here if any
-
+    controller: IK220 or IK220Mock
+        Wrapper of the IK 220 DLL, or its simulator in MOCK mode.
     """
     params = comon_parameters + [
         {'title': 'Mode:', 'name': 'mode', 'type': 'list', 'limits': ['MOCK', 'IK220'],
