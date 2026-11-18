@@ -17,10 +17,15 @@ class IK220:
     """
     units = 'cm'
 
-    def __init__(self, dllpath="C:\\Program Files (x86)\\HEIDENHAIN\\DLL64"):
-        """Initialize device"""
+    def __init__(self, dllpath="C:\\Program Files (x86)\\HEIDENHAIN\\DLL64", axis=1):
+        """Initialize device
+
+        axis: IK 220 axis the encoder is connected to, from 0 to 15 (two axes per card).
+        On the Z40, the ruler is on axis 1 ("Axis 2" in the HEIDENHAIN test application).
+        """
         self.dll = None
         self.axis = []
+        self.encoder_axis = axis
         self.pStatus = c_ushort()
         self.pAlarm = c_ushort()
         if not dllpath:
@@ -47,6 +52,8 @@ class IK220:
             raise Exception("error while initialising hein libraries. " + str(e))
 
         self.get_present_axis()
+        if self.encoder_axis not in self.axis:
+            raise ValueError(f'Axis {self.encoder_axis} not found on the IK 220 cards, present axes: {self.axis}')
         self.config_endat()
 
     def config_endat(self):
@@ -57,7 +64,7 @@ class IK220:
         p_turns = c_ushort()  # pointer
         p_ref_dist = c_ushort()  # pointer
         p_cnt_dir = c_ushort()
-        for axis in self.axis:
+        for axis in [self.encoder_axis]:
             # Sequence required by the IK 220 manual (p. 33 and 47-50), checked on the Z40 card after a cold start:
             # without the first three calls, IK220ReadEn fails unless another program configured the card before.
             self.dll.IK220Init(axis)  # loads and starts the firmware; all parameters return to their default values
@@ -98,5 +105,6 @@ class IK220:
 
         """
         p_data = c_double()
-        self.dll.IK220ReadEn(1, byref(self.pStatus), byref(p_data), byref(self.pAlarm))
+        self.dll.IK220ReadEn(self.encoder_axis, byref(self.pStatus), byref(p_data), byref(self.pAlarm))
         return round(p_data.value * 2, 3)
+    
