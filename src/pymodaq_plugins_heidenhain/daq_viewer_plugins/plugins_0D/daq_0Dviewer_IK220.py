@@ -1,6 +1,7 @@
 import numpy as np
 
 from pymodaq_utils.utils import ThreadCommand
+from pymodaq_utils.config import GlobalConfig
 from pymodaq_data.data import DataToExport
 from pymodaq_gui.parameter import Parameter
 
@@ -33,9 +34,19 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
     # TODO add your particular attributes here if any
 
     """
-    params = comon_parameters+[
-        ## TODO for your custom plugin: elements to be added here as dicts in order to control your custom stage
-        ]
+    params = comon_parameters + [
+        {'title': 'Mode:', 'name': 'mode', 'type': 'list', 'limits': ['MOCK', 'IK220'],
+         'value': GlobalConfig()('heidenhain', 'ik220', 'mode'),
+         'tip': 'MOCK: simulated card, IK220: real card (applied at the next initialization)'},
+        {'title': 'Axis:', 'name': 'axis', 'type': 'int', 'min': 0, 'max': 15,
+         'value': GlobalConfig()('heidenhain', 'ik220', 'axis'),
+         'tip': 'IK 220 axis of the encoder (applied at the next initialization)'},
+        {'title': 'DLL folder:', 'name': 'dll_path', 'type': 'str',
+         'value': GlobalConfig()('heidenhain', 'ik220', 'dll_path'),
+         'tip': 'Folder of IK220Dll64.dll (applied at the next initialization)'},
+        {'title': 'Signal period (nm):', 'name': 'signal_period', 'type': 'int', 'value': 0, 'readonly': True,
+         'tip': 'Signal period of the encoder, read by IK220ConfigEn at initialization'},
+    ]
 
     def ini_attributes(self):
         #  TODO declare the type of the wrapper (and assign it to self.controller) you're going to use for easy
