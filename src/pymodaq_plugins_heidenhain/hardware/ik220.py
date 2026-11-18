@@ -125,4 +125,3 @@ class IK220:
         if self.pAlarm.value:
             raise IK220Error(f'Alarm of the EnDat encoder on axis {self.encoder_axis}')
         return round(p_data.value * 2, 3)
-    
