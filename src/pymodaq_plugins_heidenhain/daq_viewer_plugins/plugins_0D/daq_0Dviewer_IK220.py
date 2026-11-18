@@ -1,6 +1,5 @@
 import numpy as np
 
-from pymodaq_utils.utils import ThreadCommand
 from pymodaq_utils.config import GlobalConfig
 from pymodaq_data.data import DataToExport
 from pymodaq_gui.parameter import Parameter
@@ -83,14 +82,11 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
         return info, True
 
     def close(self):
-        """Terminate the communication protocol"""
-        ## TODO for your custom plugin
-        raise NotImplementedError  # when writing your own plugin remove this line
-        # only the master owns the controller (a slave must not close the shared one) and ini_stage/ini_detector may
+        """Release the controller: the IK 220 DLL has no function to end the communication"""
+        # only the master owns the controller (a slave must not close the shared one) and ini_detector may
         # have failed before creating it, so close can be called while self.controller is still None
         if self.is_master and self.controller is not None:
-            #  self.controller.your_method_to_terminate_the_communication()  # when writing your own plugin replace this line
-            ...
+            self.controller = None
 
     def grab_data(self, Naverage=1, **kwargs):
         """Read the position of the encoder, in mm
@@ -104,12 +100,7 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
                             units='mm')]))
 
     def stop(self):
-        """Stop the current grab hardware wise if necessary"""
-        ## TODO for your custom plugin
-        raise NotImplementedError  # when writing your own plugin remove this line
-        self.controller.your_method_to_stop_acquisition()  # when writing your own plugin replace this line
-        self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
-        ##############################
+        """Nothing to stop: a reading of the encoder is instantaneous"""
         return ''
 
     def commit_settings(self, param: Parameter):
@@ -120,11 +111,8 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        ## TODO for your custom plugin
-        if param.name() == "a_parameter_you've_added_in_self.params":
-           self.controller.your_method_to_apply_this_param_change()  # when writing your own plugin replace this line
-#        elif ...
-        ##
+        # mode, axis and dll_path are applied at the next initialization, signal_period is read-only
+        pass
 
 
 if __name__ == '__main__':
