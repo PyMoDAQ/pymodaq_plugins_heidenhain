@@ -33,10 +33,16 @@ Viewer0D
 Installation instructions
 =========================
 
-* PyMoDAQ 5.3.x on Windows 64 bits.
+* PyMoDAQ 5.3.x on Windows 64 bits, with a 64-bit Python.
 * HEIDENHAIN IK 220 driver and DLL (``IK220Dll64.dll``), package 739275-05 for Windows 10 64 bits. Compatibility
   with Windows 11 has not been checked yet.
-* Not tested on hardware yet.
+* In the local configuration file ``config_heidenhain.toml`` (in ``C:\Users\<user>\.pymodaq\config``), set
+  ``mode = 'IK220'`` in the ``[ik220]`` section, and the axis of the encoder if it is not 1. The default mode,
+  ``MOCK``, uses a simulated card.
+* Only one program may use the card at a time: close the HEIDENHAIN test application before initializing the plugin.
+* Tested with an IK 220 card and an LC 483 encoder (Dilor Z40), Windows 10 64 bits version 1607, PyQt5,
+  PyMoDAQ 5.3.11. With PyQt5, use pymodaq_gui 5.3.11: pymodaq_gui 5.3.12 does not start with PyQt5 (reported to
+  PyMoDAQ).
 
 Development
 ===========
