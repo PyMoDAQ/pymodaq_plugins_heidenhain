@@ -1,5 +1,9 @@
 """
-Wrapper for grating movement using Arduino
+Wrapper of the HEIDENHAIN IK 220 DLL (IK220Dll64.dll), to read the absolute position of an EnDat encoder.
+
+Written for the LC 483 linear encoder of the Dilor Z40 spectrometer, tested on Windows 10 64 bits with the
+HEIDENHAIN driver 739275-05. Only one program may use the card at a time: the HEIDENHAIN test application calls
+IK220Init when it starts, which erases the configuration made by this class.
 """
 
 import os
@@ -18,8 +22,14 @@ class IK220Error(Exception):
 
 
 class IK220:
-    """
-    Wrapper to the Heidenhain dll
+    """Absolute EnDat encoder connected to an IK 220 card.
+
+    The constructor loads the DLL, checks that the axis exists and configures it (IK220Init, EnDat encoder,
+    IK220ResetEn, IK220ConfigEn); get_axis_position then returns the position in mm.
+
+    Example:
+        ik = IK220(axis=1)
+        position_mm = ik.get_axis_position()
     """
     units = 'mm'
 
@@ -48,6 +58,7 @@ class IK220:
         self.config_endat()
 
     def config_endat(self):
+        """Initialize the card on the encoder axis and configure it for an EnDat encoder."""
         p_status = c_ushort()  # pointer
         p_type = c_ushort()  # pointer
         p_period = c_ulong()  # pointer
@@ -71,19 +82,12 @@ class IK220:
             self.signal_period_nm = p_period.value  # 20000 for the LC 483 (20 µm)
 
     def get_present_axis(self):
-        """
-        :return:
-            position of the axis i with respect to the
-        Input:
-            None
-        Output:
-            pointer 16 entries
-        """
+        """List the axes of the IK 220 cards (two per card) found by IK220Find_64, stored in self.axis."""
         serial = (c_uint64 * 16)()
         if not self.dll.IK220Find_64(byref(serial)):
             raise IK220Error('IK220Find_64 failed: is the IK 220 driver installed?')
         self.axis = []
-        for i in range(0, 16, 1):  # There is 16 axis numbered from 0 t 15
+        for i in range(0, 16, 1):  # 16 axes at most, numbered from 0 to 15
             if serial[i] > 0:
                 self.axis.append(i)
             else:
