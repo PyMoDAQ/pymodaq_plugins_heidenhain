@@ -35,28 +35,12 @@ class IK220:
         self.signal_period_nm = None  # signal period of the encoder, read by IK220ConfigEn
         self.pStatus = c_ushort()
         self.pAlarm = c_ushort()
-        if not dllpath:
-            dllpath = 'C:\\Program Files (x86)\\HEIDENHAIN'
-            if is_64bits:
-                if platform.machine() == "AMD64":
-                    dllpath = os.path.join(dllpath, 'DLL64')
-                else:
-                    dllpath = os.path.join(dllpath, 'DLL')
+        if platform.system() != "Windows" or not is_64bits:
+            raise IK220Error('The IK 220 DLL is used here with Windows and a 64-bit Python only')
         try:
-            # Check operating system and load library
-            if platform.system() == "Windows":
-                if is_64bits:
-                    dllname = os.path.join(dllpath, "IK220Dll64")
-                    # print(dllname)
-                    self.dll = cdll.LoadLibrary(dllname)
-                else:
-                    dllname = os.path.join(dllpath, "IK220Dll")
-                    self.dll = cdll.LoadLibrary(dllname)
-            else:
-                print("Cannot detect operating system, will now stop")
-                raise Exception("Cannot detect operating system, will now stop")
-        except Exception as e:
-            raise Exception("error while initialising hein libraries. " + str(e))
+            self.dll = cdll.LoadLibrary(os.path.join(dllpath, "IK220Dll64"))
+        except OSError as e:
+            raise IK220Error(f'Cannot load IK220Dll64 from {dllpath}: is the IK 220 driver installed? ({e})') from e
 
         self.get_present_axis()
         if self.encoder_axis not in self.axis:
