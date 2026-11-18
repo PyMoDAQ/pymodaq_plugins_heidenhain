@@ -58,6 +58,11 @@ class IK220:
         p_ref_dist = c_ushort()  # pointer
         p_cnt_dir = c_ushort()
         for axis in self.axis:
+            # Sequence required by the IK 220 manual (p. 33 and 47-50), checked on the Z40 card after a cold start:
+            # without the first three calls, IK220ReadEn fails unless another program configured the card before.
+            self.dll.IK220Init(axis)  # loads and starts the firmware; all parameters return to their default values
+            self.dll.IK220WritePar(axis, 1, 1)  # parameter 1 = 1: EnDat encoder (default 0: incremental)
+            self.dll.IK220ResetEn(axis, byref(p_status))  # resets the EnDat encoder
             self.dll.IK220ConfigEn(axis, byref(p_status), byref(p_type), byref(p_period), byref(p_step), byref(p_turns),
                                    byref(p_ref_dist), byref(p_cnt_dir))
 
