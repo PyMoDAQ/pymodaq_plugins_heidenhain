@@ -21,7 +21,7 @@ class IK220:
     """
     Wrapper to the Heidenhain dll
     """
-    units = 'cm'
+    units = 'mm'
 
     def __init__(self, dllpath="C:\\Program Files (x86)\\HEIDENHAIN\\DLL64", axis=1):
         """Initialize device
@@ -32,6 +32,7 @@ class IK220:
         self.dll = None
         self.axis = []
         self.encoder_axis = axis
+        self.signal_period_nm = None  # signal period of the encoder, read by IK220ConfigEn
         self.pStatus = c_ushort()
         self.pAlarm = c_ushort()
         if not dllpath:
@@ -83,6 +84,7 @@ class IK220:
                                            byref(p_turns), byref(p_ref_dist), byref(p_cnt_dir))
                     or p_status.value != 0):
                 raise IK220Error(f'IK220ConfigEn failed on axis {axis} (status 0x{p_status.value:04X})')
+            self.signal_period_nm = p_period.value  # 20000 for the LC 483 (20 µm)
 
     def get_present_axis(self):
         """
@@ -105,16 +107,10 @@ class IK220:
         return f'Axis {self.axis} are present'
 
     def get_axis_position(self):
-        """
-        :return: the absolute position deduced from one period.
-        To obtain the real value in cm^{-1} this result has to be multiplied by a factor 2.
-        Finally, as our goal is t reach a resolution of 0.1 cm^{-1} (i.e. 1µm),
-        the obtained result is rounded
+        """Absolute position of the encoder, in mm.
 
-        Input:
-            None
-        Output:
-
+        IK220ReadEn gives the position in signal periods (IK 220 manual, p. 49), converted with the signal period
+        read by IK220ConfigEn (in nm: 20000 for the LC 483, whose signal period is 20 µm).
         """
         p_data = c_double()
         ok = self.dll.IK220ReadEn(self.encoder_axis, byref(self.pStatus), byref(p_data), byref(self.pAlarm))
@@ -124,4 +120,4 @@ class IK220:
                              f'(status {status}: {ENDAT_READ_STATUS.get(status, "unknown")})')
         if self.pAlarm.value:
             raise IK220Error(f'Alarm of the EnDat encoder on axis {self.encoder_axis}')
-        return round(p_data.value * 2, 3)
+        return p_data.value * self.signal_period_nm * 1e-6
