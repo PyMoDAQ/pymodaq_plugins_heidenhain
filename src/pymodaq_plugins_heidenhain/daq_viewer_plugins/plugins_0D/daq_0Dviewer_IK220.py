@@ -7,20 +7,11 @@ from pymodaq_gui.parameter import Parameter
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
 from pymodaq.utils.data import DataFromPlugins
 
-#  TODO:
-#  Replace the following fake import with the import of the real Python wrapper of your instrument. Here we suppose that
-#  the wrapper is in the hardware directory, but it could come from an external librairy like pylablib or pymeasure.
-from pymodaq_plugins_template.hardware.python_wrapper_file_of_your_instrument import PythonWrapperObjectOfYourInstrument
-
-# TODO:
-# (1) change the name of the following class to DAQ_0DViewer_TheNameOfYourChoice
-# (2) change the name of this file to daq_0Dviewer_TheNameOfYourChoice ("TheNameOfYourChoice" should be the SAME
-#     for the class name and the file name.)
-# (3) this file should then be put into the right folder, namely IN THE FOLDER OF THE PLUGIN YOU ARE DEVELOPING:
-#     pymodaq_plugins_my_plugin/daq_viewer_plugins/plugins_0D
+from pymodaq_plugins_heidenhain.hardware.ik220 import IK220
+from pymodaq_plugins_heidenhain.hardware.ik220_mock import IK220Mock
 
 
-class DAQ_0DViewer_Template(DAQ_Viewer_base):
+class DAQ_0DViewer_IK220(DAQ_Viewer_base):
     """ Instrument plugin class for a OD viewer.
     
     This object inherits all functionalities to communicate with PyMoDAQ’s DAQ_Viewer module through inheritance via
@@ -49,7 +40,7 @@ class DAQ_0DViewer_Template(DAQ_Viewer_base):
     def ini_attributes(self):
         #  TODO declare the type of the wrapper (and assign it to self.controller) you're going to use for easy
         #  autocompletion
-        self.controller: PythonWrapperObjectOfYourInstrument = None
+        self.controller: IK220 = None
 
         #TODO declare here attributes you want/need to init with a default value
         pass
