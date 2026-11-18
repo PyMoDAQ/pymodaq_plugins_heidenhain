@@ -33,4 +33,3 @@ def test_absent_axis_fails_the_initialization(qapp):
 def test_close_releases_the_controller(detector):
     detector.close()
     assert detector.controller is None
-    
