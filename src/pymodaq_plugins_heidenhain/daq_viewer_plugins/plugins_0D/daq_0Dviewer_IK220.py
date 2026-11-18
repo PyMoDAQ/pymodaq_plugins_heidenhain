@@ -17,9 +17,10 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
     Compatible devices: HEIDENHAIN IK 220 PC counter card (PCI) with an absolute encoder with EnDat interface, such as
     the LC 483 linear encoder.
 
-    Tested: the hardware class (hardware/ik220.py) was tested with an IK 220 card and an LC 483 encoder on axis 1
-    (ruler of the Dilor Z40 spectrometer), Windows 10 64 bits, PyMoDAQ 5.3.11, including after a cold start of the PC.
-    The plugin itself has only been tested in MOCK mode so far (simulated card, hardware/ik220_mock.py).
+    Tested with an IK 220 card and an LC 483 encoder on axis 1 (ruler of the Dilor Z40 spectrometer), Windows 10
+    64 bits (version 1607), PyQt5, PyMoDAQ 5.3.11 with pymodaq_gui 5.3.11: the hardware class, including after a cold
+    start of the PC, and the plugin in DAQ_Viewer (position stable to about 30 nm). Also tested in MOCK mode (simulated
+    card, hardware/ik220_mock.py).
 
     Installation: HEIDENHAIN IK 220 driver and DLL (IK220Dll64.dll, package 739275-05 for Windows 10 64 bits), and a
     64-bit Python. Set the mode to IK220 and the axis in the local configuration file config_heidenhain.toml.
