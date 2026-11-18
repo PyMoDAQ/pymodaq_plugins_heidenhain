@@ -5,7 +5,7 @@ Wrapper for grating movement using Arduino
 import os
 import platform
 import sys
-from ctypes import c_ulong, c_double, c_ushort
+from ctypes import c_ulong, c_double, c_ushort, c_uint64
 from ctypes import cdll, byref
 
 is_64bits = sys.maxsize > 2 ** 32
@@ -70,8 +70,8 @@ class IK220:
         Output:
             pointer 16 entries
         """
-        serial = (c_ulong * 16)()
-        self.dll.IK220Find(byref(serial))
+        serial = (c_uint64 * 16)()
+        self.dll.IK220Find_64(byref(serial))
         self.axis = []
         for i in range(0, 16, 1):  # There is 16 axis numbered from 0 t 15
             if serial[i] > 0:
