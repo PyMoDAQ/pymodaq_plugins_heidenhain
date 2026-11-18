@@ -9,6 +9,12 @@ from ctypes import c_ulong, c_double, c_ushort, c_uint64
 from ctypes import cdll, byref
 
 is_64bits = sys.maxsize > 2 ** 32
+# Status written by IK220ReadEn (IK 220 manual, p. 49)
+ENDAT_READ_STATUS = {0: 'ok', 1: 'encoder not responding or not connected', 2: 'CRC error', 3: 'type A error'}
+
+
+class IK220Error(Exception):
+    """Error reported by the IK 220 card, its driver or the EnDat encoder."""
 
 
 class IK220:
@@ -67,11 +73,16 @@ class IK220:
         for axis in [self.encoder_axis]:
             # Sequence required by the IK 220 manual (p. 33 and 47-50), checked on the Z40 card after a cold start:
             # without the first three calls, IK220ReadEn fails unless another program configured the card before.
-            self.dll.IK220Init(axis)  # loads and starts the firmware; all parameters return to their default values
-            self.dll.IK220WritePar(axis, 1, 1)  # parameter 1 = 1: EnDat encoder (default 0: incremental)
-            self.dll.IK220ResetEn(axis, byref(p_status))  # resets the EnDat encoder
-            self.dll.IK220ConfigEn(axis, byref(p_status), byref(p_type), byref(p_period), byref(p_step), byref(p_turns),
-                                   byref(p_ref_dist), byref(p_cnt_dir))
+            if not self.dll.IK220Init(axis):  # loads and starts the firmware; all parameters return to default values
+                raise IK220Error(f'IK220Init failed on axis {axis}')
+            if not self.dll.IK220WritePar(axis, 1, 1):  # parameter 1 = 1: EnDat encoder (default 0: incremental)
+                raise IK220Error(f'IK220WritePar failed on axis {axis}')
+            if not self.dll.IK220ResetEn(axis, byref(p_status)) or p_status.value != 0:  # resets the EnDat encoder
+                raise IK220Error(f'IK220ResetEn failed on axis {axis} (status {p_status.value})')
+            if (not self.dll.IK220ConfigEn(axis, byref(p_status), byref(p_type), byref(p_period), byref(p_step),
+                                           byref(p_turns), byref(p_ref_dist), byref(p_cnt_dir))
+                    or p_status.value != 0):
+                raise IK220Error(f'IK220ConfigEn failed on axis {axis} (status 0x{p_status.value:04X})')
 
     def get_present_axis(self):
         """
@@ -83,7 +94,8 @@ class IK220:
             pointer 16 entries
         """
         serial = (c_uint64 * 16)()
-        self.dll.IK220Find_64(byref(serial))
+        if not self.dll.IK220Find_64(byref(serial)):
+            raise IK220Error('IK220Find_64 failed: is the IK 220 driver installed?')
         self.axis = []
         for i in range(0, 16, 1):  # There is 16 axis numbered from 0 t 15
             if serial[i] > 0:
@@ -105,6 +117,12 @@ class IK220:
 
         """
         p_data = c_double()
-        self.dll.IK220ReadEn(self.encoder_axis, byref(self.pStatus), byref(p_data), byref(self.pAlarm))
+        ok = self.dll.IK220ReadEn(self.encoder_axis, byref(self.pStatus), byref(p_data), byref(self.pAlarm))
+        if not ok or self.pStatus.value != 0:
+            status = self.pStatus.value
+            raise IK220Error(f'IK220ReadEn failed on axis {self.encoder_axis} '
+                             f'(status {status}: {ENDAT_READ_STATUS.get(status, "unknown")})')
+        if self.pAlarm.value:
+            raise IK220Error(f'Alarm of the EnDat encoder on axis {self.encoder_axis}')
         return round(p_data.value * 2, 3)
     
