@@ -49,12 +49,7 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
     ]
 
     def ini_attributes(self):
-        #  TODO declare the type of the wrapper (and assign it to self.controller) you're going to use for easy
-        #  autocompletion
         self.controller: IK220 = None
-
-        #TODO declare here attributes you want/need to init with a default value
-        pass
 
     def ini_detector(self, controller=None):
         """Detector communication initialization
@@ -72,24 +67,20 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
             False if initialization failed otherwise True
         """
 
-        raise NotImplementedError  # TODO when writing your own plugin remove this line and modify the one below
         if self.is_master:
-            self.controller = PythonWrapperObjectOfYourInstrument()  #instantiate you driver with whatever arguments are needed
-            self.controller.open_communication() # call eventual methods
-            initialized = self.controller.a_method_or_atttribute_to_check_if_init()  # TODO
+            controller_class = IK220Mock if self.settings['mode'] == 'MOCK' else IK220
+            self.controller = controller_class(dllpath=self.settings['dll_path'], axis=self.settings['axis'])
         else:
             self.controller = controller
-            initialized = True
+        self.settings.child('signal_period').setValue(self.controller.signal_period_nm)
 
-        # TODO for your custom plugin (optional) initialize viewers panel with the future type of data
-        self.dte_signal_temp.emit(DataToExport(name='myplugin',
-                                               data=[DataFromPlugins(name='Mock1',
-                                                                    data=[np.array([0]), np.array([0])],
-                                                                    dim='Data0D',
-                                                                    labels=['Mock1', 'label2'])]))
+        # prepares the viewer for one value, the position in mm
+        self.dte_signal_temp.emit(DataToExport(name='IK220', data=[
+            DataFromPlugins(name='IK220', data=[np.array([0.])], dim='Data0D', labels=['Position'], units='mm')]))
 
-        info = "Whatever info you want to log"
-        return info, initialized
+        info = (f"IK 220 axis {self.controller.encoder_axis} ({self.settings['mode']}), "
+                f"signal period {self.controller.signal_period_nm} nm")
+        return info, True
 
     def close(self):
         """Terminate the communication protocol"""
