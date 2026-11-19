@@ -41,8 +41,7 @@ Installation instructions
   ``MOCK``, uses a simulated card.
 * Only one program may use the card at a time: close the HEIDENHAIN test application before initializing the plugin.
 * Tested with an IK 220 card and an LC 483 encoder (Dilor Z40), Windows 10 64 bits version 1607, PyQt5,
-  PyMoDAQ 5.3.11. With PyQt5, use pymodaq_gui 5.3.11: pymodaq_gui 5.3.12 does not start with PyQt5 (reported to
-  PyMoDAQ).
+  PyMoDAQ 5.3.12 with pymodaq_gui 5.3.11.
 
 Development
 ===========
