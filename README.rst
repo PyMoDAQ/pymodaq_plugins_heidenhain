@@ -9,8 +9,8 @@ pymodaq_plugins_heidenhain
    :target: https://pymodaq.readthedocs.io/en/stable/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://github.com/jerlfan/pymodaq_plugins_heidenhain/actions/workflows/tests.yml/badge.svg
-    :target: https://github.com/jerlfan/pymodaq_plugins_heidenhain/actions/workflows/tests.yml
+.. image:: https://github.com/PyMoDAQ/pymodaq_plugins_heidenhain/actions/workflows/tests.yml/badge.svg
+    :target: https://github.com/PyMoDAQ/pymodaq_plugins_heidenhain/actions/workflows/tests.yml
 
 PyMoDAQ plugins for HEIDENHAIN encoders read through the IK 220 PC counter card, such as the LC 483 absolute linear
 encoder (EnDat interface). This branch targets **PyMoDAQ 5.3.x** (Python 3.10 to 3.13).
