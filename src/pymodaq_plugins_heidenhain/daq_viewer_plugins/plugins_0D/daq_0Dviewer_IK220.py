@@ -18,7 +18,7 @@ class DAQ_0DViewer_IK220(DAQ_Viewer_base):
     the LC 483 linear encoder.
 
     Tested with an IK 220 card and an LC 483 encoder on axis 1 (ruler of the Dilor Z40 spectrometer), Windows 10
-    64 bits (version 1607), PyQt5, PyMoDAQ 5.3.11 with pymodaq_gui 5.3.11: the hardware class, including after a cold
+    64 bits (version 1607), PyQt5, PyMoDAQ 5.3.12 with pymodaq_gui 5.3.11: the hardware class, including after a cold
     start of the PC, and the plugin in DAQ_Viewer (position stable to about 30 nm). Also tested in MOCK mode (simulated
     card, hardware/ik220_mock.py).
 
